@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "4.0.4"
+}
+
+mainClassName = 'com.wardenfar.osm2map.Main'
+group 'com.wardenfar.spigot'
+version '3.1'
+
+compileJava.options.encoding = 'UTF-8'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://hub.spigotmc.org/nexus/content/groups/public/"
+    }
+    maven {
+        url 'http://ci.athion.net/job/FastAsyncWorldEdit/ws/mvn/'
+    }
+    maven {
+        url 'http://mvn.topobyte.de'
+    }
+    maven {
+        url "http://mvn.slimjars.com"
+    }
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile group: 'org.spigotmc', name: 'spigot-api', version: '1.12.2-R0.1-SNAPSHOT'
+
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+    compile 'de.topobyte:osm4j-core:0.1.0'
+    compile 'de.topobyte:osm4j-utils:0.1.2'
+    compile 'de.topobyte:osm4j-xml:0.1.2'
+    compile 'de.topobyte:osm4j-pbf:0.1.1'
+    compile 'de.topobyte:osm4j-tbo:0.1.0'
+    compile 'de.topobyte:osm4j-geometry:0.1.0'
+
+    compile files('libs/intake-spigot-4.2.35-plugin-with-xyc.jar')
+
+    compile group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
+
+    compile group: 'com.flowpowered', name: 'flow-math', version: '1.0.3'
+    compile group: 'com.vividsolutions', name: 'jts-core', version: '1.14.0'
+
+    shadow files('libs/worldedit-core-6.1.10-SNAPSHOT.jar')
+    compile files('libs/jnbt-1.1.jar')
+
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
+
+    compile group: 'com.h2database', name: 'h2', version: '1.4.196'
+
+    compile 'com.boydti:fawe-api:latest'
+
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+
+}
+
+task copyJar(type: Copy) {
+    from shadowJar // here it automatically reads jar file produced from jar task
+    into 'C:/Users/Theo/git/o2m/servers/server1/plugins'
+}
+
+shadowJar {
+    version = '3.1'
+    relocate 'org.apache.commons', 'com.wardenfar.shade.org.apache.common'
+    relocate 'de.topobyte', 'com.wardenfar.shade.de.topobyte'
+}
+
+task buildApp (dependsOn: [shadowJar, copyJar])

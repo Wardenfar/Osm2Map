@@ -1,0 +1,24 @@
+2 96,160,54                # grass
+12 219,211,160             # sand
+251:8 125,125,115          # concrete_silver
+159:9 87,91,91             # hardened_clay_stained_cyan
+251:8 155,155,148          # concrete_powder_silver
+1 125,125,125              # stone
+1:5 131,131,131            # stone_andesite
+1:6 133,133,135            # stone_andesite_smooth
+35:8 142,142,135           # wool_colored_silver
+43 161,161,161             # double_stone_slab
+4 123,123,123              # cobblestone
+251:7 15,18,22             # concrete_gray -40
+13 127,124,122             # gravel
+24:2 220,212,163           # sandstone_smooth
+
+# Green
+252:13 82,104,             # concrete_powder_green -15
+159:5 94,169,25            # concrete_lime
+159:13 93,111,56           # concrete_green +20
+18:3 126,123,113           # leaves_jungle -20
+18:0 115,115,115           # leaves_oak -20
+18:1 96,96,96              # leaves_spruce -20
+
+#82 159,165,177            # clay

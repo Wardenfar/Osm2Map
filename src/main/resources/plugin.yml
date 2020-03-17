@@ -1,0 +1,7 @@
+name: "osm2map"
+version: "3.1"
+author: "Wardenfar"
+main: "com.wardenfar.osm2map.Osm2map"
+api-version: "1.14"
+
+load: STARTUP
