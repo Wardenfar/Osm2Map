@@ -26,6 +26,9 @@ repositories {
     maven {
         url "http://mvn.slimjars.com"
     }
+    maven {
+        url 'https://maven.sk89q.com/repo/'
+    }
     jcenter()
 }
 
@@ -50,7 +53,7 @@ dependencies {
     compile group: 'com.flowpowered', name: 'flow-math', version: '1.0.3'
     compile group: 'com.vividsolutions', name: 'jts-core', version: '1.14.0'
 
-    shadow files('libs/worldedit-core-6.1.10-SNAPSHOT.jar')
+    shadow 'com.sk89q.worldedit:worldedit-core:6.1'
     compile files('libs/jnbt-1.1.jar')
 
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
@@ -59,14 +62,13 @@ dependencies {
 
     compile 'com.boydti:fawe-api:latest'
 
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
-
+    //compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.1'
+    //compile 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
 }
 
 task copyJar(type: Copy) {
-    from shadowJar // here it automatically reads jar file produced from jar task
-    into 'C:/Users/Theo/git/o2m/servers/server1/plugins'
+    from shadowJar
+    into 'servers/server1/plugins'
 }
 
 shadowJar {

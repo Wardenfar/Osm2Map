@@ -19,7 +19,6 @@ import org.bukkit.material.MaterialData;
 
 import java.awt.Rectangle;
 import java.io.File;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +46,9 @@ public class OsmElevGenerator extends ChunkGenerator {
         plugin.initWorld(world.name);
         if (!init) {
             init = true;
-            trees.addAllFiles(new File(plugin.getConfig(world.name).generation.treeSchematicsFolder), true);
+            if(plugin.getConfig(world.name).generation.treeSchematicsEnabled) {
+                trees.addAllFiles(new File(plugin.getConfig(world.name).generation.treeSchematicsFolder), true);
+            }
             //cars.addAllFilesRotateTag(new File("osm/schematic/car"));
             //fountains.addAllFiles(new File("osm/schematic/fountain"), false);
         }
@@ -171,21 +172,23 @@ public class OsmElevGenerator extends ChunkGenerator {
         }
 
         //int maxBuffer = Math.max(trees.getBuffer(), fountains.getBuffer());
-        int maxBuffer = trees.getBuffer();
-        List<JtsMapElement> mapElements = mapData.getMapElementsFromChunk(min.copy().sub(maxBuffer), max.copy().add(maxBuffer));
-        for (JtsMapElement me : mapElements) {
-            if (me.type.equals("tree") && !trees.schems.isEmpty()) {
-                if (me.geometry instanceof Point) {
-                    Point p = (Point) me.geometry;
-                    pasteTree(world, buffer, config.generation.seed, (int) p.getX(), (int) p.getY());
-                }
-            }/* else if (me.type.equals("fountain") && !fountains.schems.isEmpty()) {
+        if(config.generation.treeSchematicsEnabled) {
+            int maxBuffer = trees.getBuffer();
+            List<JtsMapElement> mapElements = mapData.getMapElementsFromChunk(min.copy().sub(maxBuffer), max.copy().add(maxBuffer));
+            for (JtsMapElement me : mapElements) {
+                if (me.type.equals("tree") && !trees.schems.isEmpty()) {
+                    if (me.geometry instanceof Point) {
+                        Point p = (Point) me.geometry;
+                        pasteTree(world, buffer, config.generation.seed, (int) p.getX(), (int) p.getY());
+                    }
+                }/* else if (me.type.equals("fountain") && !fountains.schems.isEmpty()) {
                 Point centroid = me.geometry.getCentroid();
                 Vector3i center = new Vector3i(centroid.getX(), plugin.getElevByBlockXZ(world.name, (int) centroid.getX(), (int) centroid.getY()) + 1, (int) centroid.getY());
                 SuperSchematic fountain = fountains.schems.get(0);
                 Vector3i origin = center.sub(fountain.getWidth() / 2, 0, fountain.getLength() / 2);
                 pasteSchem(buffer, fountain, origin);
             }*/
+            }
         }
 
         List<String> typesIgnored = Arrays.asList("footway");

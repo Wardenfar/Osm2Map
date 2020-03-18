@@ -31,6 +31,7 @@ public class SchemList {
                     }
                 } catch (Exception e) {
                     System.err.println("Error when loading schem : " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
@@ -53,6 +54,7 @@ public class SchemList {
                     addSchem(schem);
                 } catch (Exception e) {
                     System.err.println("Error when loading schem : " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }

@@ -68,22 +68,23 @@ public class SuperSchematic {
                     final int newX = v.getBlockX();
                     final int newZ = v.getBlockZ();
                     for (int y = 0; y < height; ++y) {
-                        final BaseBlock block = getBlock(new Vector(x, y, z));
+                        Vector schemBlockVector = new Vector(x, y, z);
+                        BaseBlock block = getBlock(schemBlockVector);
 
                         if (block == null) {
                             continue;
                         }
                         if (reverse) {
                             for (int i = 0; i < numRotations; ++i) {
-                                block.setData(BlockData.rotate90Reverse(block.getType(), block.getData()));
+                                block = new BaseBlock(block.getId(), BlockData.rotate90Reverse(block.getType(), block.getData()));
                             }
                         } else {
                             for (int i = 0; i < numRotations; ++i) {
-                                block.setData(BlockData.rotate90(block.getType(), block.getData()));
+                                block = new BaseBlock(block.getId(), BlockData.rotate90(block.getType(), block.getData()));
                             }
                         }
 
-                        rotatedClip.setBlock(null, new Vector(newX, y, newZ), block);
+                        rotatedClip.setBlock(new Vector(newX, y, newZ), block);
                     }
                 }
             }

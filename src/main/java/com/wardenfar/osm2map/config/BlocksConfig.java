@@ -9,8 +9,6 @@ public class BlocksConfig {
     public String buildingsBorderBlock = "minecraft:cobblestone";
     public String buildingsCornerBlock = "minecraft:stonebrick";
     public String buildingsFillBlock = "minecraft:planks";
-    /*public String buildingsRoofBlock = "5:1";
-    public String buildingsActiveBlock = "159";*/
 
     public String gardensCornerBlock = "minecraft:fence";
     public String gardensBorderBlock = "minecraft:leaves";

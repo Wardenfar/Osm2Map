@@ -4,21 +4,21 @@ minecraft:sand 219,211,160                          # sand
 minecraft:concrete:8 125,125,115                    # concrete_silver
 minecraft:stained_hardened_clay:9 87,91,91          # hardened_clay_stained_cyan
 minecraft:concrete_powder:8 155,155,148             # concrete_powder_silver
-minecraft:stone 125,125,125              			# stone
-minecraft:stone:5 131,131,131            			# stone_andesite
-minecraft:stone:6 133,133,135            			# stone_andesite_smooth
-minecraft:wool:8 142,142,135           				# wool_colored_silver
+minecraft:stone 125,125,125                         # stone
+minecraft:stone:5 131,131,131                       # stone_andesite
+minecraft:stone:6 133,133,135                       # stone_andesite_smooth
+minecraft:wool:8 142,142,135                        # wool_colored_silver
 minecraft:double_stone_slab 161,161,161             # double_stone_slab
-minecraft:cobblestone 123,123,123              		# cobblestone
-minecraft:concrete:7 15,18,22             			# concrete_gray -40
-minecraft:gravel 127,124,122             			# gravel
-minecraft:sandstone:2 220,212,163           		# sandstone_smooth
+minecraft:cobblestone 123,123,123                   # cobblestone
+minecraft:concrete:7 15,18,22                       # concrete_gray -40
+minecraft:gravel 127,124,122                        # gravel
+minecraft:sandstone:2 220,212,163                   # sandstone_smooth
 
 # Green
-minecraft:grass 96,160,54                			# grass
-minecraft:concrete_powder:13 82,104,30           	# concrete_powder_green -15
+minecraft:grass 96,160,54                           # grass
+minecraft:concrete_powder:13 82,104,30              # concrete_powder_green -15
 minecraft:stained_hardened_clay:5 94,169,25         # concrete_lime
 minecraft:stained_hardened_clay:13 93,111,56        # concrete_green +20
-minecraft:leaves:3 126,123,113           			# leaves_jungle -20
-minecraft:leaves:0 115,115,115           			# leaves_oak -20
-minecraft:leaves:1 96,96,96              			# leaves_spruce -20
+minecraft:leaves:3 126,123,113                      # leaves_jungle -20
+minecraft:leaves 115,115,115                        # leaves_oak -20
+minecraft:leaves:1 96,96,96                         # leaves_spruce -20

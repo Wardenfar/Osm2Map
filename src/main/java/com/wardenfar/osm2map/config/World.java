@@ -3,7 +3,6 @@ package com.wardenfar.osm2map.config;
 import com.wardenfar.osm2map.db.Database;
 import com.wardenfar.osm2map.map.DBMapData;
 import com.wardenfar.osm2map.map.ElevFile;
-import com.wardenfar.osm2map.map.entity.GeFile;
 import com.wardenfar.osm2map.tile.Tiles;
 
 import java.util.List;
@@ -11,9 +10,8 @@ import java.util.List;
 public class World {
 
     public String name = "world";
-    public Config config = new Config();
-
     public boolean forceInit = false;
+    public Config config = new Config();
 
     public transient boolean forceInitSave = false;
 
@@ -23,6 +21,5 @@ public class World {
 
     public transient Tiles tiles;
     public transient List<ElevFile> elevFiles;
-    public transient List<GeFile> geFiles;
 
 }

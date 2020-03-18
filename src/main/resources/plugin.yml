@@ -5,3 +5,4 @@ main: "com.wardenfar.osm2map.Osm2map"
 api-version: "1.14"
 
 load: STARTUP
+depend: [FastAsyncWorldEdit]

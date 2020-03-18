@@ -4,8 +4,6 @@ import com.boydti.fawe.FaweAPI;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.sk89q.intake.dispatcher.Dispatcher;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import com.wardenfar.osm2map.command.*;
 import com.wardenfar.osm2map.command.provider.ZoneTypeProvider;
 import com.wardenfar.osm2map.config.Config;
@@ -14,7 +12,10 @@ import com.wardenfar.osm2map.config.Worlds;
 import com.wardenfar.osm2map.db.Database;
 import com.wardenfar.osm2map.map.DBMapData;
 import com.wardenfar.osm2map.map.ElevFile;
-import com.wardenfar.osm2map.map.entity.*;
+import com.wardenfar.osm2map.map.entity.JtsZone;
+import com.wardenfar.osm2map.map.entity.LatLon;
+import com.wardenfar.osm2map.map.entity.Vector2d;
+import com.wardenfar.osm2map.map.entity.Vector2i;
 import com.wardenfar.osm2map.pluginInterface.BukkitInterface;
 import com.wardenfar.osm2map.pluginInterface.Interface;
 import com.wardenfar.osm2map.request.RequestManager;
@@ -556,46 +557,6 @@ public class Osm2map extends JavaPlugin implements Listener {
         }
         return best;
     }
-
-    public Float getHeightBuilding(String worldName, Geometry building) {
-        World world = worlds.getWorld(worldName);
-        for (GeFile geFile : world.geFiles) {
-            if (geFile.geometry.intersects(building)) {
-                Point p = null;
-                Float elev = null;
-                for (Map.Entry<Point, Float> e : geFile.buildingData.entrySet()) {
-                    if (Util.intersectsRect(building, e.getKey().getX() - 0.5f, e.getKey().getY() - 0.5f, 1, 1)) { // || building.isWithinDistance(e.getKey(), 10)
-                        p = e.getKey();
-                        elev = e.getValue();
-                        //System.out.println(building.getCentroid() + " " + p + " " + elev + " " + mapData.unproject(new Vector2d(p.getX(), p.getY())));
-                        break;
-                    }
-                }
-                if (elev == null) {
-                    return null;
-                } else {
-                    float maxDistance = 20;
-                    Geometry buildingBuffer = building.buffer(maxDistance).difference(building);
-                    float sum = 0;
-                    int count = 0;
-                    for (Map.Entry<Point, Float> e : geFile.wayData.entrySet()) {
-                        if (buildingBuffer.intersects(e.getKey())) {
-                            sum += e.getValue();
-                            count += 1;
-                        }
-                    }
-                    if (count != 0) {
-                        float ground = sum / (float) count;
-                        return elev - ground;
-                    } else {
-                        return elev - getElevByBlockXZ(worldName, (int) p.getX(), (int) p.getY()) + world.mapData.getHeight();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
 
     private boolean isInList(String id, String[] list) {
         for (String l : list) {
