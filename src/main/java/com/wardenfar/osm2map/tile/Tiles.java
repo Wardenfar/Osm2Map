@@ -84,7 +84,6 @@ public class Tiles {
                             .replace("{zoom}", Integer.toString(zoom))
                             .replace("{x}", Integer.toString(pos.x))
                             .replace("{y}", Integer.toString(pos.y));
-                    System.out.println(url);
                     tile.tile = ImageIO.read(new URL(url));
                     ImageIO.write(tile.tile, "png", tileFile);
                 }

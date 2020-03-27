@@ -26,8 +26,8 @@ public class ZoneMaskManager extends FaweMaskManager {
         String player = fp.getName();
         String worldName = fp.getWorld().getName();
 
-        World world = plugin.getWorlds().getWorld(worldName);
-        if(world != null && world.config.guard.active){
+        World pluginWorld = plugin.getWorlds().getWorld(worldName);
+        if(pluginWorld != null && pluginWorld.config.guard.active){
             DBMapData mapData = plugin.getMapData(worldName);
 
             Vector2d tl = mapData.getTopLeftPos();
@@ -36,7 +36,13 @@ public class ZoneMaskManager extends FaweMaskManager {
             Region maskedRegion = new SimpleRegion(FaweAPI.getWorld(worldName), new Vector(tl.x, 0, tl.y), new Vector(br.x, 256, br.y)) {
                 @Override
                 public boolean contains(int x, int y, int z) {
-                    return contains(x, z);
+                    if(contains(x, z)){
+                        int dirtLayerSize = pluginWorld.config.generation.dirtLayerSize;
+                        int elev = plugin.getElevByBlockXZ(worldName, x, z);
+                        int bedrockTopY = Math.max(0, elev - dirtLayerSize - 2) + 1;
+                        return y > bedrockTopY;
+                    }
+                    return false;
                 }
 
                 @Override
@@ -48,7 +54,8 @@ public class ZoneMaskManager extends FaweMaskManager {
             return new FaweMask(maskedRegion, "Osm2Map") {
                 @Override
                 public boolean isValid(FawePlayer player, MaskType type) {
-                    return mapData.isPlayerCanChangeAt(player.getName(), new Vector2i(player.getLocation().x, player.getLocation().z), true);
+                    //return mapData.isPlayerCanChangeAt(player.getName(), new Vector2i(player.getLocation().x, player.getLocation().z), true);
+                    return true;
                 }
             };
         }

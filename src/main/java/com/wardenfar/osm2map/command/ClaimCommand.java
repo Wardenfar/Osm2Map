@@ -37,12 +37,12 @@ public class ClaimCommand extends Commands {
             Util.sendMessage(src, "Guard not active !", ChatColor.RED);
             return;
         }
-        int maxClaim = plugin.getConfig(src.getWorld().getName()).maxClaim;
+        int maxClaim = plugin.getConfig(src.getWorld().getName()).guard.maxClaim;
         if (maxClaim != -1 && plugin.getMapData(src.getWorld().getName()).getZonesOwnedByPlayer(src.getName()).size() >= maxClaim) {
             sendMessage(src, "You already own a maximum of zones", ChatColor.RED);
         } else {
             List<String> friends = args == null ? new ArrayList<>() : Arrays.asList(args.split(" "));
-            int maxFriend = plugin.getConfig(src.getWorld().getName()).maxFriend;
+            int maxFriend = plugin.getConfig(src.getWorld().getName()).guard.maxFriend;
             if (maxFriend != -1 && friends.size() > maxFriend) {
                 sendMessage(src, "The maximum number of friends per zone is " + maxFriend, ChatColor.RED);
             } else {

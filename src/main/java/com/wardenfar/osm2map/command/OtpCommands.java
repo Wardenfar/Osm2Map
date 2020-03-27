@@ -203,7 +203,7 @@ public class OtpCommands extends Commands {
                 }
                 Vector2i tpPoint = max.div(count);
 
-                Bukkit.getServer().dispatchCommand(player, "otp xyz " + tpPoint.x + " " + tpPoint.y);
+                tp(player, tpPoint.toDouble());
 
                 z.computePixels(null, null);
 

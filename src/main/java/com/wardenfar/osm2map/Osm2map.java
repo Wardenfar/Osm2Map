@@ -27,6 +27,7 @@ import li.l1t.common.intake.IntakeCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.ItemFrame;
@@ -34,15 +35,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleCreateEvent;
+import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.ChunkGenerator;
@@ -61,7 +61,7 @@ import static com.wardenfar.osm2map.Util.sendMessage;
 
 public class Osm2map extends JavaPlugin implements Listener {
 
-    public static String VERSION = "3.1";
+    public static String VERSION = "3.2";
 
     public static int POI_PAGE_SIZE = 15;
 
@@ -137,7 +137,7 @@ public class Osm2map extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerUse(PlayerInteractEvent event) {
         Player p = event.getPlayer();
-        if (worlds.getWorld(p.getWorld().getName()).config.guard.active) {
+        if (!isGuardActive(p.getWorld())) {
             return;
         }
         Material type = p.getItemInHand().getType();
@@ -157,7 +157,7 @@ public class Osm2map extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onCreatureSpawnEvent(CreatureSpawnEvent event) {
-        if (worlds.getWorld(event.getEntity().getWorld().getName()).config.guard.active) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
             return;
         }
         event.setCancelled(isCancelledSpawnEntity(event.getEntity()));
@@ -165,7 +165,7 @@ public class Osm2map extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onProjectileLaunchEvent(ProjectileLaunchEvent event) {
-        if (worlds.getWorld(event.getEntity().getWorld().getName()).config.guard.active) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
             return;
         }
         event.setCancelled(isCancelledSpawnEntity(event.getEntity()));
@@ -173,7 +173,7 @@ public class Osm2map extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemSpawnEvent(ItemSpawnEvent event) {
-        if (worlds.getWorld(event.getEntity().getWorld().getName()).config.guard.active) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
             return;
         }
         event.setCancelled(isCancelledSpawnEntity(event.getEntity()));
@@ -181,7 +181,7 @@ public class Osm2map extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onHangingPlaceEvent(HangingPlaceEvent event) {
-        if (worlds.getWorld(event.getEntity().getWorld().getName()).config.guard.active) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
             return;
         }
         event.setCancelled(isCancelledSpawnEntity(event.getEntity()));
@@ -241,7 +241,7 @@ public class Osm2map extends JavaPlugin implements Listener {
 
             w.setSpawnLocation(centerX, getElevByBlockXZ(world.name, centerX, centerZ) + 15, centerZ);
 
-            if (world.config.guard.active) {
+            if (!isGuardActive(world)) {
                 w.getWorldBorder().setCenter(centerX, centerZ);
                 w.getWorldBorder().setSize(Math.max(centerX, centerZ) * 2);
                 w.setTime(6000);
@@ -320,7 +320,7 @@ public class Osm2map extends JavaPlugin implements Listener {
             worlds = Util.readOrCreateWorlds(configFile);
 
             for (World world : worlds.worlds) {
-                if (world.config.guard.active) {
+                if (isGuardActive(world)) {
                     FaweAPI.addMaskManager(new ZoneMaskManager(this));
                     break;
                 }
@@ -356,8 +356,6 @@ public class Osm2map extends JavaPlugin implements Listener {
                 } else {
                     mapData = DBMapData.readFromDB(this, db);
                 }
-                System.out.println(mapData.getTopLeftPos());
-                System.out.println(mapData.getBottomRightPos());
                 world.mapData = mapData;
 
                 world.elevFiles = new ArrayList<>();
@@ -366,19 +364,6 @@ public class Osm2map extends JavaPlugin implements Listener {
                     File directory = new File(config.generation.elevation.folder);
                     for (File dataFile : directory.listFiles()) {
                         String filename = dataFile.getName();
-                        /*if (filename.startsWith(config.generation.elevPrefix) && filename.endsWith("_" + config.generation.elevPrecision + "_export.data")) {
-                            ElevFile elevFile = worlds.elevFileMap.get(filename);
-                            if (elevFile != null) {
-                                logger.info("Already Load " + filename);
-                                world.elevFiles.add(elevFile);
-                            } else {
-                                logger.info("Load " + filename);
-                                elevFile = ElevFile.importFile(logger, dataFile);
-                                logger.info("Loaded !");
-                                world.elevFiles.add(elevFile);
-                                worlds.elevFileMap.put(filename, elevFile);
-                            }
-                        }*/
 
                         if (!filename.endsWith(".elev")) {
                             logger.info("Don't end with .elev : " + filename);
@@ -406,29 +391,6 @@ public class Osm2map extends JavaPlugin implements Listener {
                     }
                 }
 
-                /*if (config.building.active) {
-                    logger.info("Load GeData ...");
-                    world.geFiles = new ArrayList<>();
-                    Geometry rect = Util.geometryFromRectCorners(mapData.getBottomRight().lat, mapData.getTopLeft().lon, mapData.getTopLeft().lat, mapData.getBottomRight().lon);
-                    mapData.projectGeometry(rect);
-                    JsonArray geConfigFile = gson.fromJson(new FileReader(new File(config.building.geConfigFile)), JsonArray.class);
-                    for (int i = 0; i < geConfigFile.size(); i++) {
-                        JsonObject geFile = (JsonObject) geConfigFile.get(i);
-                        LatLon tl = new LatLon(geFile.get("maxLat").getAsFloat(), geFile.get("minLon").getAsFloat());
-                        LatLon br = new LatLon(geFile.get("minLat").getAsFloat(), geFile.get("maxLon").getAsFloat());
-                        Geometry geRect = Util.geometryFromRectCorners(tl.lat, tl.lon, br.lat, br.lon);
-                        mapData.projectGeometry(geRect);
-                        if (rect.intersects(geRect)) {
-                            GeFile object = GeFile.fromFile(mapData, new File("osm/ge/" + geFile.get("name").getAsString()));
-                            object.geometry = geRect;
-                            world.geFiles.add(object);
-                            logger.info(geFile.get("name").getAsString() + " loaded");
-                        } else {
-                            logger.info(geFile.get("name").getAsString() + " don't intersects");
-                        }
-                    }
-                }*/
-
                 if (config.tile.active) {
                     world.tiles = new Tiles(this, world.name);
                 }
@@ -443,7 +405,7 @@ public class Osm2map extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerTeleportEvent(PlayerTeleportEvent event) {
         org.bukkit.World to = event.getTo().getWorld();
-        if (!worlds.getWorld(to.getName()).config.guard.active) {
+        if (!isGuardActive(to)) {
             return;
         }
         Player player = event.getPlayer();
@@ -458,43 +420,127 @@ public class Osm2map extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onBlockExplodeEvent(BlockExplodeEvent event) {
+        if (!isGuardActive(event.getBlock().getWorld())) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityExplodeEvent(EntityExplodeEvent event) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPortalCreateEvent(PortalCreateEvent event) {
+        if (!isGuardActive(event.getWorld())) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onFireworkExplodeEvent(FireworkExplodeEvent event) {
+        if (!isGuardActive(event.getEntity().getWorld())) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVehicleCreateEvent(VehicleCreateEvent event) {
+        if (!isGuardActive(event.getVehicle().getWorld())) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onStructureGrowEvent(StructureGrowEvent event) {
+        if (!isGuardActive(event.getWorld())) {
+            return;
+        }
+
+        boolean cancelFinal = true;
+        for (BlockState block : new ArrayList<>(event.getBlocks())) {
+            boolean cancelled = isCancelledBlockChange(block.getLocation(), event.getPlayer(), block.getLocation().getBlock().getType(), block.getType());
+            if (!cancelled) {
+                cancelFinal = false;
+            } else {
+                event.getBlocks().remove(block);
+            }
+        }
+
+        event.setCancelled(cancelFinal);
+    }
+
+    @EventHandler
+    public void onBlockFormEvent(BlockFormEvent event) {
+        if (!isGuardActive(event.getBlock().getWorld())) {
+            return;
+        }
+        boolean cancelled = isCancelledBlockChange(event.getBlock().getLocation(), null, event.getBlock().getType(), event.getNewState().getType());
+        event.setCancelled(cancelled);
+    }
+
+    @EventHandler
+    public void onBlockFadeEvent(BlockFadeEvent event) {
+        if (!isGuardActive(event.getBlock().getWorld())) {
+            return;
+        }
+        boolean cancelled = isCancelledBlockChange(event.getBlock().getLocation(), null, event.getBlock().getType(), event.getNewState().getType());
+        event.setCancelled(cancelled);
+    }
+
+    @EventHandler
     public void onBlockBreakEvent(BlockBreakEvent event) {
-        boolean cancelled = isCancelledBlockChange(event, event.getPlayer(), event.getBlock().getType(), Material.AIR);
+        boolean cancelled = isCancelledBlockChange(event.getBlock().getLocation(), event.getPlayer(), event.getBlock().getType(), Material.AIR);
         event.setCancelled(cancelled);
     }
 
     @EventHandler
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
-        boolean cancelled = isCancelledBlockChange(event, event.getPlayer(), Material.AIR, event.getBlockPlaced().getType());
+        boolean cancelled = isCancelledBlockChange(event.getBlock().getLocation(), event.getPlayer(), Material.AIR, event.getBlockPlaced().getType());
         event.setCancelled(cancelled);
     }
 
-    private boolean isCancelledBlockChange(BlockEvent event, Player player, Material before, Material after) {
-        Location location = event.getBlock().getLocation();
+    private boolean isCancelledBlockChange(Location location, Player player, Material before, Material after) {
         Vector3i blockPos = Util.toVector(location).toInt();
         World world = worlds.getWorld(location.getWorld().getName());
 
-        if (!world.config.guard.active) {
+        if (!isGuardActive(world)) {
             return false;
         }
 
-        String playerName = player.getName();
         Vector2i pos = new Vector2i(blockPos.getX(), blockPos.getZ());
 
         Integer idBefore = ((BukkitInterface) inter).getBlockId(before);
         Integer idAfter = ((BukkitInterface) inter).getBlockId(after);
 
         if (isInList(Util.getStringId(idAfter), blacklistedPlaceBlocksIDs) || isInList(Util.getStringId(idBefore), blacklistedBreakBlocksIDs)) {
-            sendMessage(player, "BlackListed Block :(", ChatColor.RED);
+            if (player != null) {
+                sendMessage(player, "BlackListed Block :(", ChatColor.RED);
+            }
             return true;
         }
-        if (world.mapData.getModos().contains(playerName)) {
-            return false;
+        if (player != null) {
+            String playerName = player.getName();
+            if (world.mapData.getModos().contains(playerName)) {
+                return false;
+            }
+            if (world.mapData.isPlayerCanChangeAt(playerName, pos, true)) {
+                return false;
+            }
+
+            sendMessage(player, "Restricted Area :(", ChatColor.RED);
+        } else {
+            //System.out.println("Restricted Area :(");
         }
-        if (world.mapData.isPlayerCanChangeAt(playerName, pos, true)) {
-            return false;
-        }
-        sendMessage(player, "Restricted Area :(", ChatColor.RED);
+
         return true;
     }
 
@@ -581,6 +627,20 @@ public class Osm2map extends JavaPlugin implements Listener {
             sendMessage(src, t);
         }
     }*/
+
+    public boolean isGuardActive(org.bukkit.World w) {
+        if (worlds.getWorld(w.getName()) == null) {
+            return false;
+        }
+        return worlds.getWorld(w.getName()).config.guard.active;
+    }
+
+    public boolean isGuardActive(World w) {
+        if (w == null) {
+            return false;
+        }
+        return w.config.guard.active;
+    }
 
     public DBMapData getMapData(String worldName) {
         World world = worlds.getWorld(worldName);
