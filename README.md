@@ -21,9 +21,6 @@ Osm2Map is only available for `Spigot 1.12.2` for now
 - **Customizable**
    - Change all blocks used by the Generator (ground, ways, ...)
 
-Example Eiffel Tower :
-![alt text](./.github/images/eiffel_1.jpg "Logo Title Text 1")
-
 ### Doc pages
 - [Installation](.github/doc/INSTALL.md)
 - [Configuration](.github/doc/CONFIG.md)
@@ -31,3 +28,6 @@ Example Eiffel Tower :
 - [Guard Mode](.github/doc/GUARD.md)
 - [Satellite Images (ground coloring)](.github/doc/TILES.md)
 - [OpenStreetMap](.github/doc/OSM.md)
+
+Example Eiffel Tower :
+![alt text](./.github/images/eiffel_1.jpg "Logo Title Text 1")
