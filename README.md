@@ -28,4 +28,4 @@ Example Eiffel Tower :
 - [Commands and Permissions](.github/doc/COMMANDS.md)
 - [Guard Mode](.github/doc/GUARD.md)
 - [Satellite Images (ground coloring)](.github/doc/TILES.md)
-- [OpenStreetMap Parsing](.github/doc/OSM.md)
+- [OpenStreetMap](.github/doc/OSM.md)

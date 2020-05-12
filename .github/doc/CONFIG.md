@@ -1,9 +1,9 @@
-- [Installation](.github/doc/INSTALL.md)
-- [Configuration](.github/doc/CONFIG.md)
-- [Commands and Permissions](.github/doc/COMMANDS.md)
-- [Guard Mode](.github/doc/GUARD.md)
-- [Satellite Images (ground coloring)](.github/doc/TILES.md)
-- [OpenStreetMap Parsing](.github/doc/OSM.md)
+- [Installation](INSTALL.md)
+- [Configuration](CONFIG.md)
+- [Commands and Permissions](COMMANDS.md)
+- [Guard Mode](GUARD.md)
+- [Satellite Images (ground coloring)](TILES.md)
+- [OpenStreetMap](OSM.md)
 
 # Config Documentation
 
